@@ -1,3 +1,4 @@
+require("dotenv").config();
 const { syncBuiltinESMExports } = require("module");
 const config = require("./config.js");
 const puppeteer = require("puppeteer");
@@ -15,8 +16,8 @@ const puppeteer = require("puppeteer");
 
   await page.evaluate(() => console.log(`url is ${location.href}`));
 
-  await page.type("#user_login", config.loginConfig.tokyo_42.userName);
-  await page.type("#user_password", config.loginConfig.tokyo_42.password);
+  await page.type("#user_login", process.env.TOKYO_42_USERNAME);
+  await page.type("#user_password", process.env.TOKYO_42_PASSWORD);
   const submitButtonDiv = await page.$(".form-actions");
   const submitButton = await submitButtonDiv.$(".btn");
   if (submitButton) {
@@ -49,9 +50,9 @@ const puppeteer = require("puppeteer");
     console.log(`${i}th discordLoginFormDiv`);
     const discordLoginForm = await discordLoginFormDiv.$("input");
     if (i == 0) {
-      await discordLoginForm.type(config.loginConfig.discord.email);
+      await discordLoginForm.type(process.env.DISCORD_EMAIL);
     } else {
-      await discordLoginForm.type(config.loginConfig.discord.password);
+      await discordLoginForm.type(process.env.DISCORD_PASSWORD);
     }
   }
 
