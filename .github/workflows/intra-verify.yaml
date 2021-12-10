@@ -1,0 +1,26 @@
+name: Intra-verify
+
+# on:
+#   schedule:
+#     - cron: "5 20 * * *" # 日本時間の AM 5:05 (UTC 20:05) に実行
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.x]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: "14.x"
+
+      - name: install command
+        run: yarn install
+
+      - name: RUN main.js
+        run: node main.js
