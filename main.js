@@ -2,50 +2,83 @@ const { syncBuiltinESMExports } = require("module");
 const config = require("./config.js");
 const puppeteer = require("puppeteer");
 
-(async() => {
-    // const browser = await puppeteer.launch();
-    const browser = await puppeteer.launch({
-        headless: false,
-        slowMo: 100,
-    });
-    const page = await browser.newPage();
-    await page.goto("https://discord.42tokyo.jp/");
+(async () => {
+  // const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({
+    headless: false,
+    slowMo: 10,
+  });
+  const page = await browser.newPage();
+  await page.goto("https://discord.42tokyo.jp/");
 
-    page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
+  page.on("console", (msg) => console.log("PAGE LOG:", msg.text()));
 
-    await page.evaluate(() => console.log(`url is ${location.href}`));
+  await page.evaluate(() => console.log(`url is ${location.href}`));
 
-    console.log(config.loginConfig);
-    await page.type("#user_login", config.loginConfig.tokyo_42.userName);
-    await page.type("#user_password", config.loginConfig.tokyo_42.password);
-    const submitButtonDiv = await page.$(".form-actions");
-    const submitButton = await submitButtonDiv.$(".btn");
-    console.log(submitButton);
-    if (submitButton) {
-        await Promise.all([
-            page.waitForNavigation({
-                waitUntil: ["load", "networkidle2"],
-            }),
-            submitButton.click(),
-        ]);
+  await page.type("#user_login", config.loginConfig.tokyo_42.userName);
+  await page.type("#user_password", config.loginConfig.tokyo_42.password);
+  const submitButtonDiv = await page.$(".form-actions");
+  const submitButton = await submitButtonDiv.$(".btn");
+  if (submitButton) {
+    await Promise.all([
+      page.waitForNavigation({
+        waitUntil: ["load", "networkidle2"],
+      }),
+      submitButton.click(),
+    ]);
+  }
+
+  console.log("-----------login success------------");
+
+  const authorizeButtonDiv = await page.$(".actions");
+  const authorizeButton = await authorizeButtonDiv.$(".btn-success");
+  if (authorizeButton) {
+    await Promise.all([
+      page.waitForNavigation({
+        waitUntil: ["load", "networkidle2"],
+      }),
+      authorizeButton.click(),
+    ]);
+  }
+
+  console.log("-----------OAuth success------------");
+
+  const discordLoginFormDivs = await page.$$(".inputWrapper-31_8H8");
+
+  for (const [i, discordLoginFormDiv] of discordLoginFormDivs.entries()) {
+    console.log(`${i}th discordLoginFormDiv`);
+    const discordLoginForm = await discordLoginFormDiv.$("input");
+    if (i == 0) {
+      await discordLoginForm.type(config.loginConfig.discord.email);
+    } else {
+      await discordLoginForm.type(config.loginConfig.discord.password);
     }
+  }
 
-    console.log("-----------login success------------");
+  const discordLoginButton = await page.$(".button-3k0cO7");
+  if (discordLoginButton) {
+    await Promise.all([
+      page.waitForNavigation({
+        waitUntil: ["load", "networkidle2"],
+      }),
+      page.waitForSelector("div.footer-3ZalXG"),
+      discordLoginButton.click(),
+    ]);
+  }
 
-    const authorizeButtonDiv = await page.$(".actions");
-    const authorizeButton = await authorizeButtonDiv.$(".btn-success");
-    console.log(authorizeButton);
-    if (authorizeButton) {
-        await Promise.all([
-            page.waitForNavigation({
-                waitUntil: ["load", "networkidle2"],
-            }),
-            authorizeButton.click(),
-        ]);
-    }
+  console.log("-----------discord login success------------");
+  const discordAuthButtonDiv = await page.$(".footer-3ZalXG");
+  console.log(discordAuthButtonDiv);
+  const discordAuthButton = await discordAuthButtonDiv.$(".lookFilled-1Gx00P");
 
-    console.log("-----------OAuth success------------");
-    await page.waitFor(500000);
-
-    await browser.close();
+  console.log(discordAuthButton);
+  if (discordAuthButton) {
+    await Promise.all([
+      page.waitForNavigation({
+        waitUntil: ["load", "networkidle2"],
+      }),
+      discordAuthButton.click(),
+    ]);
+  }
+  await browser.close();
 })();
