@@ -1,6 +1,7 @@
 name: Intra-verify
 
-# on:
+on:
+  push:
 #   schedule:
 #     - cron: "5 20 * * *" # 日本時間の AM 5:05 (UTC 20:05) に実行
 
