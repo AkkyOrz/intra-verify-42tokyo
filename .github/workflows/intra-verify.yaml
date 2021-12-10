@@ -11,6 +11,11 @@ jobs:
     strategy:
       matrix:
         node-version: [14.x]
+    env:
+      TOKYO_42_USERNAME: ${{ secrets.TOKYO_42_USERNAME }}
+      TOKYO_42_PASSWORD: ${{ secrets.TOKYO_42_PASSWORD }}
+      DISCORD_EMAIL: ${{ secrets.DISCORD_EMAIL }}
+      DISCORD_PASSWORD: ${{ secrets.DISCORD_PASSWORD }}
 
     steps:
       - uses: actions/checkout@v2
