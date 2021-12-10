@@ -1,14 +1,13 @@
 require("dotenv").config();
 const { syncBuiltinESMExports } = require("module");
-const config = require("./config.js");
 const puppeteer = require("puppeteer");
 
 (async () => {
-  // const browser = await puppeteer.launch();
-  const browser = await puppeteer.launch({
-    headless: false,
-    slowMo: 10,
-  });
+  const browser = await puppeteer.launch();
+  // const browser = await puppeteer.launch({
+  //     headless: false,
+  //     slowMo: 10,
+  // });
   const page = await browser.newPage();
   await page.goto("https://discord.42tokyo.jp/");
 
