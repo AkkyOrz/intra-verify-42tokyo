@@ -9,6 +9,8 @@
         "@types/puppeteer": "^5.4.4",
         "dotenv": "^10.0.0",
         "puppeteer": "^13.0.0",
+        "puppeteer-extra": "^3.2.3",
+        "puppeteer-extra-plugin-recaptcha": "^3.5.0",
         "winston": "^3.3.3"
     },
     "devDependencies": {
@@ -19,7 +21,7 @@
     },
     "scripts": {
         "start": "ts-node src/index.ts",
-        "dev": "ts-node src/index.ts",
+        "dev": "ENVIRONMENT=local ts-node src/index.ts",
         "dev:watch": "ts-node-dev --respawn src/index.ts"
     }
 }

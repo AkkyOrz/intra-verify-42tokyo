@@ -1,8 +1,21 @@
 const envPath = "./.env";
-
 require("dotenv").config({ path: envPath });
+
 const { syncBuiltinESMExports } = require("module");
-import puppeteer, { Browser, Page, ElementHandle } from "puppeteer";
+import puppeteer from "puppeteer-extra";
+import { Browser, Page, ElementHandle, Frame } from "puppeteer";
+const RecaptchaPlugin = require("puppeteer-extra-plugin-recaptcha")
+puppeteer.use(
+  RecaptchaPlugin({
+    provider: {
+      id: "2captcha",
+      token: "XXXXXXX", // REPLACE THIS WITH YOUR OWN 2CAPTCHA API KEY ⚡
+    },
+  })
+)
+const { createLogger, format, transports } = require("winston");
+const { splat, combine, timestamp, label, printf, simple } = format;
+
 import {
   setCredentials,
   CredentialsTokyo42,
@@ -12,8 +25,6 @@ import {
 import clickButton from "./button";
 import assertIsDefined from "./assertIsDefined";
 import { assert } from "console";
-const { createLogger, format, transports } = require("winston");
-const { splat, combine, timestamp, label, printf, simple } = format;
 
 type InfoType = {
   level: string;
@@ -68,16 +79,23 @@ const loginDiscord = async (page: Page, credDiscord: CredentialsDiscord) => {
     }
   }
   logger.info("-----------discord fill-in form------------");
-
   const discordLoginButton = await page.$(".button-3k0cO7");
   if (discordLoginButton) {
-    await Promise.all([
-      page.waitForNavigation({
-        waitUntil: ["load", "networkidle2"],
-      }),
+    await discordLoginButton.click();
+    await page.waitForTimeout(5000);
+    // console.log(page.frames());
+    const result = await Promise.race([
+      page.waitForTimeout(5 * 60 * 1000),
+      page
+        .frames()
+        .find((f) =>
+          f.url().startsWith("https://newassets.hcaptcha.com/captcha/")
+        ),
       page.waitForSelector("div.footer-3ZalXG"),
-      discordLoginButton.click(),
     ]);
+    logger.info("recaptcha?");
+    // await Promise.race([page.waitForSelector("div.footer-3ZalXG")]);
+    await page.waitForTimeout(5 * 60 * 1000);
   }
   logger.info("-----------discord login success------------");
 };
@@ -89,18 +107,25 @@ const authorizeDiscord = async (page: Page) => {
   logger.info("-----------discord OAuth success------------");
 };
 
+const launchBrowser = async () => {
+  if (process.env.ENVIRONMENT === "local") {
+    return await puppeteer.launch({
+      headless: false,
+      slowMo: 10,
+    });
+  } else {
+    return await puppeteer.launch({
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
+  }
+};
+
 const main = async () => {
   logger.info("start");
 
   const credentials = setCredentials(process.env);
 
-  const browser = await puppeteer.launch({
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-  });
-  // const browser: Browser = await puppeteer.launch({
-  //   headless: false,
-  //   slowMo: 10,
-  // });
+  const browser = await launchBrowser();
   const page: Page = await browser.newPage();
 
   await login42Tokyo(page, credentials.tokyo42);
