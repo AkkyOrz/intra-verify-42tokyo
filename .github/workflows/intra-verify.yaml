@@ -30,4 +30,4 @@ jobs:
         run: npm install -g yarn && yarn install
 
       - name: RUN main.js
-        run: node main.js
+        run: yarn dev

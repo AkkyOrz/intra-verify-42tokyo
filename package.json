@@ -14,9 +14,12 @@
     "devDependencies": {
         "@types/node": "^17.0.0",
         "ts-node": "^10.4.0",
+        "ts-node-dev": "^1.1.8",
         "typescript": "^4.5.4"
     },
     "scripts": {
-        "start": "ts-node main.ts"
+        "start": "ts-node src/index.ts",
+        "dev": "ts-node src/index.ts",
+        "dev:watch": "ts-node-dev --respawn src/index.ts"
     }
 }
