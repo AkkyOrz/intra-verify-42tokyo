@@ -14,7 +14,13 @@
 
 ## local で使用する場合
 
-- 最低でも、 node, chrome のインストールが必要です
+- 最低でも、 node, yarn, chrome のインストールが必要です
+- install の方法
+  - node の install
+    - [OS の package manager 経由](https://nodejs.dev/download/package-manager/)
+    - [nvm 経由](https://github.com/nvm-sh/nvm)
+    - [nodenv, anyenv 経由](https://github.com/nodenv/nodenv)
+  - [yarn の install](https://classic.yarnpkg.com/lang/en/docs/install/#debian-stable)
 
 ### 動作を確認する
 
@@ -27,7 +33,7 @@ TOKYO_42_PASSWORD="password"
 DISCORD_EMAIL="example@student.42.example.fr"
 DISCORD_PASSWORD="password"
 EOF
-$ npm install yarn
+$ npm install -g yarn
 $ yarn
 $ yarn start # headless mode
 # yarn dev でブラウザが起動する
