@@ -45,13 +45,15 @@ const login42Tokyo = async (page: Page, cred42: CredentialsTokyo42) => {
   const submitButtonDiv = await page.$(".form-actions");
   const submitButton = await submitButtonDiv?.$(".btn");
   await clickButton(page, submitButton);
-  logger.info("-----------login success------------");
+  logger.info("-----------42tokyo login success------------");
 };
 
 const authorize42Tokyo = async (page: Page) => {
   const authorizeButtonDiv = await page.$(".actions");
   const authorizeButton = await authorizeButtonDiv?.$(".btn-success");
   await clickButton(page, authorizeButton);
+
+  logger.info("-----------42tokyo OAuth success------------");
 };
 
 const loginDiscord = async (page: Page, credDiscord: CredentialsDiscord) => {
@@ -65,6 +67,7 @@ const loginDiscord = async (page: Page, credDiscord: CredentialsDiscord) => {
       await discordLoginForm.type(credDiscord.password);
     }
   }
+  logger.info("-----------discord fill-in form------------");
 
   const discordLoginButton = await page.$(".button-3k0cO7");
   if (discordLoginButton) {
@@ -91,10 +94,13 @@ const main = async () => {
 
   const credentials = setCredentials(process.env);
 
-  const browser: Browser = await puppeteer.launch({
-    headless: false,
-    slowMo: 10,
+  const browser = await puppeteer.launch({
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
+  // const browser: Browser = await puppeteer.launch({
+  //   headless: false,
+  //   slowMo: 10,
+  // });
   const page: Page = await browser.newPage();
 
   await login42Tokyo(page, credentials.tokyo42);

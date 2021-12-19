@@ -11,7 +11,7 @@ jobs:
     timeout-minutes: 5 # 5分でタイムアウトする
     strategy:
       matrix:
-        node-version: [14.x]
+        node-version: [17.x]
     env:
       TOKYO_42_USERNAME: ${{ secrets.TOKYO_42_USERNAME }}
       TOKYO_42_PASSWORD: ${{ secrets.TOKYO_42_PASSWORD }}
@@ -21,10 +21,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Use Node.js 14.x
+      - name: apt install
+        run: apt-get update && apt-get install -y libgtk-3.0 libgbm-dev libnss3 libatk-bridge2.0-0 libasound2
+
+      - name: Use Node.js 17.x
         uses: actions/setup-node@v1
         with:
-          node-version: "14.x"
+          node-version: "17.x"
 
       - name: install command
         run: npm install -g yarn && yarn install
