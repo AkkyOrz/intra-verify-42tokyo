@@ -89,18 +89,25 @@ const authorizeDiscord = async (page: Page) => {
   logger.info("-----------discord OAuth success------------");
 };
 
+const launchBrowser = async () => {
+  if (process.env.ENVIRONMENT === "local") {
+    return await puppeteer.launch({
+      headless: false,
+      slowMo: 10,
+    });
+  } else {
+    return await puppeteer.launch({
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
+  }
+};
+
 const main = async () => {
   logger.info("start");
 
   const credentials = setCredentials(process.env);
 
-  const browser = await puppeteer.launch({
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-  });
-  // const browser: Browser = await puppeteer.launch({
-  //   headless: false,
-  //   slowMo: 10,
-  // });
+  const browser = await launchBrowser();
   const page: Page = await browser.newPage();
 
   await login42Tokyo(page, credentials.tokyo42);

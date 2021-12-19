@@ -19,7 +19,7 @@
     },
     "scripts": {
         "start": "ts-node src/index.ts",
-        "dev": "ts-node src/index.ts",
+        "dev": "ENVIRONMENT=local ts-node src/index.ts",
         "dev:watch": "ts-node-dev --respawn src/index.ts"
     }
 }
