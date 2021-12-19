@@ -8,6 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 5 # 5分でタイムアウトする
     strategy:
       matrix:
         node-version: [14.x]
@@ -26,7 +27,7 @@ jobs:
           node-version: "14.x"
 
       - name: install command
-        run: yarn install
+        run: npm install -g yarn && yarn install
 
       - name: RUN main.js
         run: node main.js
