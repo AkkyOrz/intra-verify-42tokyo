@@ -32,5 +32,5 @@ jobs:
       - name: install command
         run: npm install -g yarn && yarn install
 
-      - name: RUN main.js
+      - name: RUN script
         run: yarn dev
