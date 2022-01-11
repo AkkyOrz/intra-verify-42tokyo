@@ -52,14 +52,12 @@ const authorize42Tokyo = async (page: Page) => {
   const authorizeButtonDiv = await page.$(".actions");
   const authorizeButton = await authorizeButtonDiv?.$(".btn-success");
   await clickButton(page, authorizeButton);
-
   logger.info("-----------42tokyo OAuth success------------");
 };
 
 const loginDiscord = async (page: Page, credDiscord: CredentialsDiscord) => {
-  const discordLoginFormDivs = await page.$$(".inputWrapper-31_8H8");
-  for (const [i, discordLoginFormDiv] of discordLoginFormDivs.entries()) {
-    const discordLoginForm = await discordLoginFormDiv.$("input");
+  const discordLoginForms = await page.$$("input");
+  for (const [i, discordLoginForm] of discordLoginForms.entries()) {
     assertIsDefined(discordLoginForm);
     if (i == 0) {
       await discordLoginForm.type(credDiscord.email);
@@ -69,22 +67,19 @@ const loginDiscord = async (page: Page, credDiscord: CredentialsDiscord) => {
   }
   logger.info("-----------discord fill-in form------------");
 
-  const discordLoginButton = await page.$(".button-3k0cO7");
-  if (discordLoginButton) {
-    await Promise.all([
-      page.waitForNavigation({
-        waitUntil: ["load", "networkidle2"],
-      }),
-      page.waitForSelector("div.footer-3ZalXG"),
-      discordLoginButton.click(),
-    ]);
-  }
+  // await page.waitForTimeout(100000);
+  const discordLoginButton = await page.$('button[type="submit"]');
+  await clickButton(
+    page,
+    discordLoginButton,
+    'header[id="oauth2-authorize-header-id"]'
+  );
   logger.info("-----------discord login success------------");
 };
 
 const authorizeDiscord = async (page: Page) => {
-  const discordAuthButtonDiv = await page.$(".footer-3ZalXG");
-  const discordAuthButton = await discordAuthButtonDiv?.$(".lookFilled-1Gx00P");
+  const discordButtons = await page.$$("button");
+  const discordAuthButton = discordButtons[1];
   await clickButton(page, discordAuthButton);
   logger.info("-----------discord OAuth success------------");
 };
