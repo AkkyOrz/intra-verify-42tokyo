@@ -21,6 +21,15 @@ type InfoType = {
   timestamp: string;
 };
 
+type BrowserSettingType = {
+  args?: Array<string>;
+  executablePath?: string;
+  userDataDir?: string;
+  ignoreDefaultArgs?: Array<string>;
+  headless?: boolean;
+  slowMo?: number;
+};
+
 const myFormat = printf(({ level, message, timestamp }: InfoType) => {
   return `${timestamp} ${level}: ${message}`;
 });
@@ -33,12 +42,14 @@ const logger = createLogger({
   ],
 });
 
-const login42Tokyo = async (page: Page, cred42: CredentialsTokyo42) => {
-  await Promise.all([
-    page.waitForSelector("#user_login"),
-    page.goto("https://discord.42tokyo.jp/"),
-  ]);
+const hasAlreadyLoggedIn42 = async (page: Page) => {
+  await page.goto("https://discord.42tokyo.jp/");
 
+  const loginMainDiv = await page.$("#user_login");
+  return (loginMainDiv === null ? true : false) as boolean;
+};
+
+const login42Tokyo = async (page: Page, cred42: CredentialsTokyo42) => {
   await page.type("#user_login", cred42.name);
   await page.type("#user_password", cred42.password);
 
@@ -55,6 +66,11 @@ const authorize42Tokyo = async (page: Page) => {
   logger.info("-----------42tokyo OAuth success------------");
 };
 
+const hasAlreadyLoggedInDiscord = async (page: Page) => {
+  const discordLoginButton = await page.$("button[type=submit]");
+  return (discordLoginButton === null ? true : false) as boolean;
+};
+
 const loginDiscord = async (page: Page, credDiscord: CredentialsDiscord) => {
   const discordLoginForms = await page.$$("input");
   for (const [i, discordLoginForm] of discordLoginForms.entries()) {
@@ -67,8 +83,7 @@ const loginDiscord = async (page: Page, credDiscord: CredentialsDiscord) => {
   }
   logger.info("-----------discord fill-in form------------");
 
-  // await page.waitForTimeout(100000);
-  const discordLoginButton = await page.$('button[type="submit"]');
+  const discordLoginButton = await page.$("button[type=submit]");
   await clickButton(
     page,
     discordLoginButton,
@@ -85,16 +100,20 @@ const authorizeDiscord = async (page: Page) => {
 };
 
 const launchBrowser = async () => {
+  const configs: BrowserSettingType = {
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    ignoreDefaultArgs: ["--disable-extensions"],
+  };
   if (process.env.ENVIRONMENT === "local") {
-    return await puppeteer.launch({
-      headless: false,
-      slowMo: 10,
-    });
-  } else {
-    return await puppeteer.launch({
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
+    configs.headless = false;
+    configs.slowMo = 10;
+    configs.executablePath = "/opt/google/chrome/google-chrome";
+    configs.userDataDir = process.env.HOME + "/.config/google-chrome/";
+  } else if (process.env.ENVIRONMENT === "browser") {
+    configs.executablePath = "/opt/google/chrome/google-chrome";
+    configs.userDataDir = process.env.HOME + "/.config/google-chrome/";
   }
+  return await puppeteer.launch(configs);
 };
 
 const main = async () => {
@@ -105,9 +124,19 @@ const main = async () => {
   const browser = await launchBrowser();
   const page: Page = await browser.newPage();
 
-  await login42Tokyo(page, credentials.tokyo42);
+  const hasLoggedIn42 = await hasAlreadyLoggedIn42(page);
+  if (!hasLoggedIn42) {
+    await login42Tokyo(page, credentials.tokyo42);
+  } else {
+    logger.info("already logged in 42");
+  }
   await authorize42Tokyo(page);
-  await loginDiscord(page, credentials.discord);
+  const hasLoggedInDiscord = await hasAlreadyLoggedInDiscord(page);
+  if (!hasLoggedInDiscord) {
+    await loginDiscord(page, credentials.discord);
+  } else {
+    logger.info("already logged in discord");
+  }
   await authorizeDiscord(page);
 
   logger.info("finish");
