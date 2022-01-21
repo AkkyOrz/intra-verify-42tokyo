@@ -107,11 +107,11 @@ const launchBrowser = async () => {
   if (process.env.ENVIRONMENT === "local") {
     configs.headless = false;
     configs.slowMo = 10;
-    configs.executablePath = "/opt/google/chrome/google-chrome";
-    configs.userDataDir = process.env.HOME + "/.config/google-chrome/";
+    configs.executablePath = "/snap/bin/chromium";
+    configs.userDataDir = process.env.HOME + "/snap/chromium/common/chromium/";
   } else if (process.env.ENVIRONMENT === "browser") {
-    configs.executablePath = "/opt/google/chrome/google-chrome";
-    configs.userDataDir = process.env.HOME + "/.config/google-chrome/";
+    configs.executablePath = "/snap/bin/chromium";
+    configs.userDataDir = process.env.HOME + "/snap/chromium/common/chromium/";
   }
   return await puppeteer.launch(configs);
 };
