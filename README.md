@@ -14,13 +14,14 @@
 
 ## local で使用する場合
 
-- 最低でも、 node, yarn, chrome のインストールが必要です
+- 最低でも、 node, yarn, chromium のインストールが必要です(現状Linuxでのみ動作確認をしています)
 - install の方法
   - node の install
     - [OS の package manager 経由](https://nodejs.dev/download/package-manager/)
     - [nvm 経由](https://github.com/nvm-sh/nvm)
     - [nodenv, anyenv 経由](https://github.com/nodenv/nodenv)
   - [yarn の install](https://classic.yarnpkg.com/lang/en/docs/install/#debian-stable)
+  - chromium の install
 
 ### 動作を確認する
 
