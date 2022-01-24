@@ -101,7 +101,7 @@ const authorizeDiscord = async (page: Page) => {
 
 const launchBrowser = async () => {
   const configs: BrowserSettingType = {
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    args: ["--no-sandbox", "--disable-setuid-sandbox", "---disable-gpu"],
     ignoreDefaultArgs: ["--disable-extensions"],
   };
   if (process.env.ENVIRONMENT === "local") {
